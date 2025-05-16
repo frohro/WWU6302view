@@ -69,17 +69,15 @@ void CommManager::connect(const char* ssid, const char* pw) {
    IPAddress ip = WiFi.localIP();
    Serial.printf("--> %d.%d.%d.%d:%d <--\n", ip[0], ip[1], ip[2], ip[3], S302_PORT);
    
-   // Start the WebSocket server
-   _wss.begin();
-   _wss.onEvent(std::bind(&CommManager::_on_websocket_event, this, _1, _2, _3, _4));
-#endif
 #ifdef ESP32
+   // Create semaphore BEFORE setting up WebSocket server
    _baton = xSemaphoreCreateMutex();
    if (_baton == NULL) {
       Serial.println("Failed to create semaphore!");
    }
 #endif
-   // Initialize timers
+
+   // Initialize timers early
 #ifdef TEENSYDUINO
    _main_timer = 0;
 #else
@@ -88,6 +86,16 @@ void CommManager::connect(const char* ssid, const char* pw) {
 #ifdef ESP32
    _secondary_timer = micros();
 #endif
+
+   // Start the WebSocket server - MOVED AFTER semaphore and timer initialization
+   _wss.begin();
+
+   // Fix: Use a lambda expression instead of std::bind to avoid potential memory issues
+   _wss.onEvent([this](uint8_t num, WStype_t type, uint8_t* payload, size_t length) {
+      this->_on_websocket_event(num, type, payload, length);
+   });
+
+   // Mark manager as ready
    _ready = true;
 }
 
