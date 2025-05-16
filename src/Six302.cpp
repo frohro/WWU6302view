@@ -58,12 +58,6 @@ void CommManager::connect(const char* ssid, const char* pw) {
    // Serial should be ready to go
    Serial.printf("Connecting to %s WiFi ", ssid);
    
-   // Initialize _ready to false
-   _ready = false;
-   
-   // Store instance pointer in static variable EARLY for callback use
-   _instance = this;
-   
    // Use existing WiFi connection if already connected
    if (WiFi.status() == WL_CONNECTED) {
       Serial.println(" already connected!");
@@ -115,30 +109,29 @@ void CommManager::connect(const char* ssid, const char* pw) {
 #endif
 #ifdef ESP32
    _secondary_timer = micros();
-   _report_timer = micros(); // Initialize report timer
 #endif
 
+   // IMPORTANT: Set static instance pointer BEFORE setting up callbacks
+   _instance = this;
+   
    // Start the WebSocket server - AFTER semaphore and timer initialization
    _wss.begin();
-
-   // Use static event handler instead of lambda to avoid memory issues
+   
+   // Use a simple static callback to avoid memory/function pointer issues
    _wss.onEvent([](uint8_t num, WStype_t type, uint8_t* payload, size_t length) {
-      // Use a safer global pointer access
-      if (CommManager::_instance) {
+      // Safely access the instance pointer
+      if (CommManager::_instance != nullptr) {
          CommManager::_instance->_on_websocket_event(num, type, payload, length);
       }
    });
-   
-   // Store instance pointer in static variable for callback use
-   _instance = this;
-   
+
    // Mark manager as ready
    _ready = true;
    
-   // Small delay to allow WebSocket server to fully initialize
+   // Add a small delay to ensure WebSocket server is properly initialized
    delay(100);
 }
-#endif  // This is the missing #endif for the initial #ifdef S302_SERIAL
+#endif  // This is the closing bracket for #ifdef S302_WEBSOCKETS
 
 /* :: pinToCore( coreID ) */
 
@@ -656,3 +649,6 @@ void CommManager::_NOT_IMPLEMENTED_YET() {}
 /* Add static instance pointer definition at the end of the file (outside all functions)
 CommManager* CommManager::_instance = nullptr;
 */
+#ifdef S302_WEBSOCKETS
+CommManager* CommManager::_instance = nullptr;
+#endif
