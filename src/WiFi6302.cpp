@@ -69,7 +69,7 @@ void setup() {
       Serial.printf("\nAttempt %d to connect to %s\n", attempts + 1, ssid);
       
       // Try direct WiFi connection
-      WiFi.begin(ssid, pw);
+      WiFi.begin(ssid, NULL);
       
       // Wait for connection or timeout
       unsigned long startTime = millis();
