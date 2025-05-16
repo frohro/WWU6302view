@@ -24,15 +24,18 @@ void setup() {
    
    // Let CommManager handle the WiFi connection
    cm.connect(ssid, password);
+   
+   // Pin the task to Core 0 to avoid conflicts with WiFi on Core 1
+   cm.pinToCore(0);
 }
 
 void loop() {
    // Generate sine wave
    output = sin(t = t + 0.02);
    
-   // Add delay to reduce CPU usage
-   delay(10);
+   // We don't need step() in the main loop when using pinToCore()
+   // The task will handle it on the other core
    
-   // Let CommManager handle everything
-   cm.step();
+   // Just add a small delay to prevent watchdog issues
+   delay(100);
 }

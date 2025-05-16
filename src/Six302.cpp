@@ -40,6 +40,9 @@ void CommManager::connect(const char* ssid, const char* pw) {
    // Serial should be ready to go
    Serial.printf("Connecting to %s WiFi ", ssid);
    
+   // Store instance pointer in static variable EARLY for callback use
+   _instance = this;
+   
    // Use existing WiFi connection if already connected
    if (WiFi.status() == WL_CONNECTED) {
       Serial.println(" already connected!");
@@ -96,19 +99,19 @@ void CommManager::connect(const char* ssid, const char* pw) {
    // Start the WebSocket server - AFTER semaphore and timer initialization
    _wss.begin();
 
-   // FIXED: Use static event handler instead of lambda to avoid memory issues
+   // Use a more stable callback approach
    _wss.onEvent([](uint8_t num, WStype_t type, uint8_t* payload, size_t length) {
-      // Use a safer global pointer access
-      if (CommManager::_instance) {
+      // Check for null instance first
+      if (CommManager::_instance != nullptr) {
          CommManager::_instance->_on_websocket_event(num, type, payload, length);
       }
    });
    
-   // Store instance pointer in static variable for callback use
-   _instance = this;
-
    // Mark manager as ready
    _ready = true;
+   
+   // Small delay to allow WebSocket server to fully initialize
+   delay(100);
 }
 #endif  // This is the missing #endif for the initial #ifdef S302_SERIAL
 
