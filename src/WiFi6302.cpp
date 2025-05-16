@@ -19,8 +19,48 @@ void setup() {
    // Connect with string copies (workaround if you can't modify the library)
    char ssid[] = "NatsNet"; // Copy string literals to RAM
    char pw[] = "curiosity";
-   cm.connect(ssid, pw);
- 
+   
+   Serial.print("Connecting to WiFi");
+   
+   // Add a timeout and retry mechanism
+   int attempts = 0;
+   const int maxAttempts = 10;
+   
+   while (attempts < maxAttempts) {
+      cm.connect(ssid, pw);
+      
+      // Wait for connection or timeout
+      unsigned long startTime = millis();
+      bool connected = false;
+      
+      while (millis() - startTime < 10000) { // 10 second timeout
+         if (WiFi.status() == WL_CONNECTED) {
+            connected = true;
+            break;
+         }
+         Serial.print(".");
+         delay(500);
+      }
+      
+      if (connected) {
+         Serial.println();
+         Serial.println("WiFi connected successfully!");
+         Serial.print("IP address: ");
+         Serial.println(WiFi.localIP());
+         break;
+      } else {
+         Serial.println();
+         Serial.printf("Connection attempt %d failed\n", attempts + 1);
+         attempts++;
+         delay(1000);
+      }
+   }
+   
+   if (WiFi.status() != WL_CONNECTED) {
+      Serial.println("Failed to connect to WiFi after multiple attempts");
+      // You could add fallback behavior here
+   }
+}
 
 void loop() {
    output = sin(t = t + 0.02);
