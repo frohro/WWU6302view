@@ -87,7 +87,7 @@ void setup() {
       
       // Try direct WiFi connection
       WiFi.begin(ssid, NULL);
-      WiFi.setTxPower(WIFI_POWER_2dBm);
+      WiFi.setTxPower(WIFI_POWER_8_5dBm);
       
       // Wait for connection or timeout
       unsigned long startTime = millis();
