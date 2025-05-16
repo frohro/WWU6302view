@@ -39,22 +39,45 @@ void CommManager::connect(HardwareSerial* s, uint32_t baud)
 void CommManager::connect(const char* ssid, const char* pw) {
    // Serial should be ready to go
    Serial.printf("Connecting to %s WiFi ", ssid);
-   WiFi.begin(ssid, pw);
+   
+   // Fix for open networks - ensure pw is not NULL
+   if (pw == NULL) {
+      // Use empty string for open networks
+      WiFi.begin(ssid, "");
+   } else {
+      WiFi.begin(ssid, pw);
+   }
+   
    WiFi.setTxPower(WIFI_POWER_8_5dBm);
-   while( WiFi.status() != WL_CONNECTED ) {
+   
+   // Add timeout to prevent infinite loop
+   int timeout = 0;
+   while (WiFi.status() != WL_CONNECTED && timeout < 30) {
       Serial.print('.');
       delay(1000);
+      timeout++;
    }
+   
+   // Check if connected successfully
+   if (WiFi.status() != WL_CONNECTED) {
+      Serial.println("\nFailed to connect to WiFi!");
+      return; // Early return if WiFi connection fails
+   }
+   
    Serial.println(" connected!");
    // Print my IP!
    IPAddress ip = WiFi.localIP();
    Serial.printf("--> %d.%d.%d.%d:%d <--\n", ip[0], ip[1], ip[2], ip[3], S302_PORT);
+   
    // Start the WebSocket server
    _wss.begin();
    _wss.onEvent(std::bind(&CommManager::_on_websocket_event, this, _1, _2, _3, _4));
 #endif
 #ifdef ESP32
    _baton = xSemaphoreCreateMutex();
+   if (_baton == NULL) {
+      Serial.println("Failed to create semaphore!");
+   }
 #endif
    // Initialize timers
 #ifdef TEENSYDUINO
