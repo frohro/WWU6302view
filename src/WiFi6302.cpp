@@ -75,7 +75,10 @@ void setup() {
    // Add a timeout and retry mechanism
    int attempts = 0;
    const int maxAttempts = 5;
-   
+
+   WiFi.setAutoConnect(false);
+   WiFi.setAutoReconnect(true);
+
    while (attempts < maxAttempts) {
       Serial.printf("\nAttempt %d to connect to %s\n", attempts + 1, ssid);
       
