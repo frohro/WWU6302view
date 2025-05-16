@@ -111,7 +111,8 @@ void setup() {
          Serial.println(WiFi.RSSI());
          
          // Now connect the CommManager
-         cm.connect(ssid, "");
+         char dummyPw[] = "dummy";  // Use a dummy password just for the CommManager
+         cm.connect(ssid, dummyPw); 
          break;
       } else {
          Serial.println();
