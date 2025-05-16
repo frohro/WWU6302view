@@ -93,7 +93,7 @@ void setup() {
          Serial.println(WiFi.RSSI());
          
          // Now connect the CommManager
-         cm.connect(ssid, pw);
+         cm.connect(ssid, NULL);
          break;
       } else {
          Serial.println();
