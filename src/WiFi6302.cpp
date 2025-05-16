@@ -32,8 +32,8 @@ void setup() {
    cm.addPlot(&output, "Plot", -1.1, 1.1);
    
    // Connect with string copies (workaround if you can't modify the library)
-   char ssid[] = "NatsNet"; // Copy string literals to RAM
-   char pw[] = "curiosity"; // Double-check this password is correct
+   char ssid[] = "Frohne-2.4GHz"; // Copy string literals to RAM
+   char pw[] = ""; // Double-check this password is correct
    
    Serial.println("Connecting to WiFi...");
    
