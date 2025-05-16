@@ -271,6 +271,11 @@ class CommManager {
       static void _walk(void* param);
 #endif
 
+#ifdef S302_WEBSOCKETS
+   // Static instance pointer for callback handling
+   static CommManager* _instance;
+#endif
+
 };
 
 #endif
