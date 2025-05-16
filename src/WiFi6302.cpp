@@ -17,8 +17,8 @@ void setup() {
    cm.addPlot(&output, "Plot", -1.1, 1.1);
    
    // Connect with string copies (workaround if you can't modify the library)
-   char ssid[] = "Frohne-2.4GHz"; // Copy string literals to RAM
-   char pw[] = "";
+   char ssid[] = "NatsNet"; // Copy string literals to RAM
+   char pw[] = "curiosity";
    cm.connect(ssid, pw);
    
    // Or use a direct cast if you modified the library to accept const char*
