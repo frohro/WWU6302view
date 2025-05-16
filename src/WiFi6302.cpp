@@ -20,10 +20,7 @@ void setup() {
    char ssid[] = "NatsNet"; // Copy string literals to RAM
    char pw[] = "curiosity";
    cm.connect(ssid, pw);
-   
-   // Or use a direct cast if you modified the library to accept const char*
-   // cm.connect("Frohne-2.4GHz", "");
-}
+ 
 
 void loop() {
    output = sin(t = t + 0.02);
