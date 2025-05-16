@@ -1,5 +1,6 @@
 #include <Six302.h>
 #include <math.h>
+#include <WiFi.h>
 
 CommManager cm(5000, 50000);
 float t, output;
@@ -18,16 +19,26 @@ void setup() {
    
    // Connect with string copies (workaround if you can't modify the library)
    char ssid[] = "NatsNet"; // Copy string literals to RAM
-   char pw[] = "curiosity";
+   char pw[] = "curiosity"; // Double-check this password is correct
    
    Serial.print("Connecting to WiFi");
+   
+   // Set WiFi mode explicitly to station mode
+   WiFi.mode(WIFI_STA);
+   
+   // Disconnect from any previous connection
+   WiFi.disconnect(true);
+   delay(1000);
    
    // Add a timeout and retry mechanism
    int attempts = 0;
    const int maxAttempts = 10;
    
    while (attempts < maxAttempts) {
-      cm.connect(ssid, pw);
+      Serial.printf("\nAttempt %d to connect to %s\n", attempts + 1, ssid);
+      
+      // Try direct WiFi connection first
+      WiFi.begin(ssid, pw);
       
       // Wait for connection or timeout
       unsigned long startTime = millis();
@@ -47,10 +58,14 @@ void setup() {
          Serial.println("WiFi connected successfully!");
          Serial.print("IP address: ");
          Serial.println(WiFi.localIP());
+         
+         // Now connect the CommManager
+         cm.connect(ssid, pw);
          break;
       } else {
          Serial.println();
          Serial.printf("Connection attempt %d failed\n", attempts + 1);
+         Serial.printf("WiFi status: %d\n", WiFi.status());
          attempts++;
          delay(1000);
       }
@@ -58,6 +73,7 @@ void setup() {
    
    if (WiFi.status() != WL_CONNECTED) {
       Serial.println("Failed to connect to WiFi after multiple attempts");
+      Serial.println("Please check the SSID and password");
       // You could add fallback behavior here
    }
 }
