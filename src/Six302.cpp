@@ -9,11 +9,29 @@
 CommManager::CommManager(uint32_t sp, uint32_t rp) {
    _step_period = sp;
    _report_period = rp;
+   _total_controls = 0;
+   _total_reporters = 0;
+   _ready = false;
+   _headroom = 0;
+#ifdef ESP32
+   _baton = NULL;
+   _six302_task = NULL;
+#endif
 #ifdef S302_WEBSOCKETS
    _wss = WebSocketsServer(S302_PORT);
 #endif
    strcpy(_build_string, "\fB");
    _debug_string[0] = '\0';
+   
+   // Initialize report timer
+#ifdef TEENSYDUINO
+   _report_timer = 0;
+#else
+   _report_timer = micros();
+#endif
+   
+   // Clear control type array
+   memset(_ctrl_types, 0, sizeof(_ctrl_types));
 }
 
 /* :: connect( &Serial, baud ) 
@@ -39,6 +57,9 @@ void CommManager::connect(HardwareSerial* s, uint32_t baud)
 void CommManager::connect(const char* ssid, const char* pw) {
    // Serial should be ready to go
    Serial.printf("Connecting to %s WiFi ", ssid);
+   
+   // Initialize _ready to false
+   _ready = false;
    
    // Store instance pointer in static variable EARLY for callback use
    _instance = this;
@@ -94,18 +115,22 @@ void CommManager::connect(const char* ssid, const char* pw) {
 #endif
 #ifdef ESP32
    _secondary_timer = micros();
+   _report_timer = micros(); // Initialize report timer
 #endif
 
    // Start the WebSocket server - AFTER semaphore and timer initialization
    _wss.begin();
 
-   // Use a more stable callback approach
+   // Use static event handler instead of lambda to avoid memory issues
    _wss.onEvent([](uint8_t num, WStype_t type, uint8_t* payload, size_t length) {
-      // Check for null instance first
-      if (CommManager::_instance != nullptr) {
+      // Use a safer global pointer access
+      if (CommManager::_instance) {
          CommManager::_instance->_on_websocket_event(num, type, payload, length);
       }
    });
+   
+   // Store instance pointer in static variable for callback use
+   _instance = this;
    
    // Mark manager as ready
    _ready = true;
@@ -603,12 +628,9 @@ void CommManager::_on_websocket_event(
 /* Else */
 
 void CommManager::debug(char* line) {
-
    // Add to the debug string buffer
    // (cuts off if too long though)
-
    TAKE
-
    uint16_t m = strlen(line);
    uint16_t n = strlen(_debug_string);
    uint16_t i = 0;
@@ -616,13 +638,9 @@ void CommManager::debug(char* line) {
       _debug_string[n] = (line[i] != '\n'? line[i]:'\r');
       i++; n++;
    }
-
    _debug_string[n]   = '\r';
    _debug_string[n+1] = '\0';
-
    GIVE
-   
-   // _debug_string will be sent at each report period
 }
 
 void CommManager::debug(String line) {
@@ -631,13 +649,10 @@ void CommManager::debug(String line) {
    debug(_buf);
 }
 
-void CommManager::_NOT_IMPLEMENTED_YET() {
+/* NOT IMPLEMENTED YET */
 
-   // I'm not ready yet
-   // Let me clean the living room
-   // Then you can come back
+void CommManager::_NOT_IMPLEMENTED_YET() {}
 
-}
-
-// Add static instance pointer definition at the end of the file (outside all functions)
+/* Add static instance pointer definition at the end of the file (outside all functions)
 CommManager* CommManager::_instance = nullptr;
+*/

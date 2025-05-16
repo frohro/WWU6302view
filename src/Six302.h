@@ -224,9 +224,6 @@ class CommManager {
       uint32_t _baud;
 #elif defined S302_WEBSOCKETS
       WebSocketsServer _wss = WebSocketsServer(S302_PORT);
-      void _on_websocket_event(
-         uint8_t num, WStype_t type,
-         uint8_t* payload, size_t length);
 #endif
       
       /* Timing */
@@ -276,6 +273,9 @@ class CommManager {
    static CommManager* _instance;
 #endif
 
+   private:
+      /* WebSocket event handling */
+      void _on_websocket_event(uint8_t num, WStype_t type, uint8_t* payload, size_t length);
 };
 
 #endif
