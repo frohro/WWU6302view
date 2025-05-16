@@ -30,6 +30,9 @@ void setup() {
    
    // Example plot
    cm.addPlot(&output, "Plot", -1.1, 1.1);
+
+    // Check heap after initialization
+   Serial.printf("Free heap after plot creation: %d bytes\n", ESP.getFreeHeap());
    
    // Connect with string copies (workaround if you can't modify the library)
    char ssid[] = "Frohne-2.4GHz"; // Copy string literals to RAM
