@@ -1,4 +1,3 @@
-
 /* Reach out to almonds@mit.edu or jodalyst@mit.edu for help */
 
 #ifndef _Six302_H_

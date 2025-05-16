@@ -1,4 +1,3 @@
-
 /* Reach out to almonds@mit.edu or jodalyst@mit.edu for help */
 
 #include "Six302.h"
@@ -41,34 +40,40 @@ void CommManager::connect(const char* ssid, const char* pw) {
    // Serial should be ready to go
    Serial.printf("Connecting to %s WiFi ", ssid);
    
-   // Fix for open networks - ensure pw is not NULL
-   if (pw == NULL) {
-      // Use empty string for open networks
-      WiFi.begin(ssid, "");
+   // Use existing WiFi connection if already connected
+   if (WiFi.status() == WL_CONNECTED) {
+      Serial.println(" already connected!");
+      Serial.printf("--> %s:%d <--\n", WiFi.localIP().toString().c_str(), S302_PORT);
    } else {
-      WiFi.begin(ssid, pw);
+      // Fix for open networks - ensure pw is not NULL
+      if (pw == NULL) {
+         // Use empty string for open networks
+         WiFi.begin(ssid, "");
+      } else {
+         WiFi.begin(ssid, pw);
+      }
+      
+      WiFi.setTxPower(WIFI_POWER_8_5dBm);
+      
+      // Add timeout to prevent infinite loop
+      int timeout = 0;
+      while (WiFi.status() != WL_CONNECTED && timeout < 30) {
+         Serial.print('.');
+         delay(1000);
+         timeout++;
+      }
+      
+      // Check if connected successfully
+      if (WiFi.status() != WL_CONNECTED) {
+         Serial.println("\nFailed to connect to WiFi!");
+         return; // Early return if WiFi connection fails
+      }
+      
+      Serial.println(" connected!");
+      // Print my IP!
+      IPAddress ip = WiFi.localIP();
+      Serial.printf("--> %d.%d.%d.%d:%d <--\n", ip[0], ip[1], ip[2], ip[3], S302_PORT);
    }
-   
-   WiFi.setTxPower(WIFI_POWER_8_5dBm);
-   
-   // Add timeout to prevent infinite loop
-   int timeout = 0;
-   while (WiFi.status() != WL_CONNECTED && timeout < 30) {
-      Serial.print('.');
-      delay(1000);
-      timeout++;
-   }
-   
-   // Check if connected successfully
-   if (WiFi.status() != WL_CONNECTED) {
-      Serial.println("\nFailed to connect to WiFi!");
-      return; // Early return if WiFi connection fails
-   }
-   
-   Serial.println(" connected!");
-   // Print my IP!
-   IPAddress ip = WiFi.localIP();
-   Serial.printf("--> %d.%d.%d.%d:%d <--\n", ip[0], ip[1], ip[2], ip[3], S302_PORT);
    
 #ifdef ESP32
    // Create semaphore BEFORE setting up WebSocket server
@@ -88,13 +93,19 @@ void CommManager::connect(const char* ssid, const char* pw) {
    _secondary_timer = micros();
 #endif
 
-   // Start the WebSocket server - MOVED AFTER semaphore and timer initialization
+   // Start the WebSocket server - AFTER semaphore and timer initialization
    _wss.begin();
 
-   // Fix: Use a lambda expression instead of std::bind to avoid potential memory issues
-   _wss.onEvent([this](uint8_t num, WStype_t type, uint8_t* payload, size_t length) {
-      this->_on_websocket_event(num, type, payload, length);
+   // FIXED: Use static event handler instead of lambda to avoid memory issues
+   _wss.onEvent([](uint8_t num, WStype_t type, uint8_t* payload, size_t length) {
+      // Use a safer global pointer access
+      if (CommManager::_instance) {
+         CommManager::_instance->_on_websocket_event(num, type, payload, length);
+      }
    });
+   
+   // Store instance pointer in static variable for callback use
+   _instance = this;
 
    // Mark manager as ready
    _ready = true;
@@ -624,3 +635,6 @@ void CommManager::_NOT_IMPLEMENTED_YET() {
    // Then you can come back
 
 }
+
+// Add static instance pointer definition at the end of the file (outside all functions)
+CommManager* CommManager::_instance = nullptr;

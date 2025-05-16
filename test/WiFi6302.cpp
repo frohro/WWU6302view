@@ -31,7 +31,7 @@ void setup() {
    // Example plot
    cm.addPlot(&output, "Plot", -1.1, 1.1);
 
-    // Check heap after initialization
+   // Check heap after initialization
    Serial.printf("Free heap after plot creation: %d bytes\n", ESP.getFreeHeap());
    
    // Connect with string copies (workaround if you can't modify the library)
@@ -57,17 +57,6 @@ void setup() {
       if (WiFi.SSID(i) == ssid) {
          foundNetwork = true;
          Serial.printf("Target network '%s' found with signal strength: %d dBm\n", ssid, WiFi.RSSI(i));
-      }
-   }
-
-   for (int i = 0; i < networksFound; i++)
-   {
-      if (WiFi.SSID(i) == ssid)
-      {
-         foundNetwork = true;
-         Serial.printf("Target network '%s' found with signal strength: %d dBm\n", ssid, WiFi.RSSI(i));
-         Serial.printf("Encryption type: %d\n", WiFi.encryptionType(i));
-         // 0 = WIFI_AUTH_OPEN, 1 = WIFI_AUTH_WEP, etc.
       }
    }
 
@@ -110,9 +99,9 @@ void setup() {
          Serial.print("Signal strength: ");
          Serial.println(WiFi.RSSI());
          
-         // Now connect the CommManager
-         char dummyPw[] = "dummy";  // Use a dummy password just for the CommManager
-         cm.connect(ssid, dummyPw); 
+         // Now connect the CommManager with existing connection
+         Serial.println("Setting up CommManager with existing connection...");
+         cm.connect(ssid, NULL);
          break;
       } else {
          Serial.println();
@@ -129,8 +118,8 @@ void setup() {
    if (WiFi.status() != WL_CONNECTED) {
       Serial.println("Failed to connect to WiFi after multiple attempts");
       Serial.println("Please check the following:");
-      Serial.println("1. SSID spelling and case (NatsNet)");
-      Serial.println("2. Password correctness (curiosity)");
+      Serial.println("1. SSID spelling and case");
+      Serial.println("2. Password correctness");
       Serial.println("3. Router is powered on and in range");
       Serial.println("4. Router is not blocking this device");
    }
