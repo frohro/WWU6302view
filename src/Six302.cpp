@@ -35,6 +35,7 @@ void CommManager::connect(HardwareSerial* s, uint32_t baud)
    delay(500);
    while( _serial->available() )
       _serial->read();
+}
 #elif defined S302_WEBSOCKETS
 void CommManager::connect(const char* ssid, const char* pw) {
    // Serial should be ready to go
@@ -98,6 +99,7 @@ void CommManager::connect(const char* ssid, const char* pw) {
    // Mark manager as ready
    _ready = true;
 }
+#endif  // This is the missing #endif for the initial #ifdef S302_SERIAL
 
 /* :: pinToCore( coreID ) */
 
