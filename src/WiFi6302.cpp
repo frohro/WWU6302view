@@ -56,7 +56,18 @@ void setup() {
          Serial.printf("Target network '%s' found with signal strength: %d dBm\n", ssid, WiFi.RSSI(i));
       }
    }
-   
+
+   for (int i = 0; i < networksFound; i++)
+   {
+      if (WiFi.SSID(i) == ssid)
+      {
+         foundNetwork = true;
+         Serial.printf("Target network '%s' found with signal strength: %d dBm\n", ssid, WiFi.RSSI(i));
+         Serial.printf("Encryption type: %d\n", WiFi.encryptionType(i));
+         // 0 = WIFI_AUTH_OPEN, 1 = WIFI_AUTH_WEP, etc.
+      }
+   }
+
    if (!foundNetwork) {
       Serial.printf("WARNING: Target network '%s' not found in scan results!\n", ssid);
    }
