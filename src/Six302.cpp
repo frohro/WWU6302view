@@ -111,33 +111,37 @@ void CommManager::connect(const char* ssid, const char* pw) {
    _secondary_timer = micros();
 #endif
 
-   // Set the static instance pointer before anything else
+   // IMPORTANT: Set static instance pointer BEFORE WebSocket initialization
    _instance = this;
-
-   // Start the WebSocket server with a short delay for ESP32 stability
-   delay(100);
+   
+   // Simple static callback function that doesn't rely on lambdas
+   _wss.onEvent(webSocketEvent);
+   
+   // Start the WebSocket server
    _wss.begin();
-   delay(100);
-
-   // Set up a very simple event handler with minimal functionality
-   _wss.onEvent([](uint8_t num, WStype_t type, uint8_t* payload, size_t length) {
-      // Only process text messages for safety
-      if (type == WStype_TEXT && CommManager::_instance != nullptr) {
-         // Simple message handling - just copy to buffer
-         if (length > 0 && length < MAX_BUFFER_LEN && payload != nullptr) {
-            memcpy(CommManager::_instance->_buf, payload, length);
-            CommManager::_instance->_buf[length] = '\0';
-         }
-      }
-   });
-
+   
    // Mark manager as ready
    _ready = true;
    
-   // Another small delay for stability
+   // Give some time for initialization
    delay(100);
 }
-#endif  // This is the closing bracket for #ifdef S302_WEBSOCKETS
+
+// Static callback function to handle WebSocket events
+void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
+   // Safety check
+   if (CommManager::_instance == nullptr) return;
+   
+   // Only handle basic text messages for stability
+   if (type == WStype_TEXT && payload != nullptr && length > 0) {
+      // Copy message to buffer with safety checks
+      if (length < MAX_BUFFER_LEN) {
+         memcpy(CommManager::_instance->_buf, payload, length);
+         CommManager::_instance->_buf[length] = '\0';
+      }
+   }
+}
+#endif  // S302_WEBSOCKETS
 
 /* :: pinToCore( coreID ) */
 

@@ -197,7 +197,6 @@ class CommManager {
 
       /* Most important buffers */
 
-      char    _buf[MAX_BUFFER_LEN]; // long general buffer
       char    _build_string[MAX_BUILD_STRING_LEN];
       char    _debug_string[MAX_DEBUG_LEN];
       char    _tmp[24]; // short general buffer
@@ -271,11 +270,19 @@ class CommManager {
 #ifdef S302_WEBSOCKETS
    // Static instance pointer for callback handling
    static CommManager* _instance;
+   
+   // Make the buffer public so the static callback can access it
+   public:
+      char _buf[MAX_BUFFER_LEN];
+   protected:
+#else
+   protected:
+      char _buf[MAX_BUFFER_LEN]; // long general buffer
 #endif
 
    private:
       /* WebSocket event handling */
-      void _on_websocket_event(uint8_t num, WStype_t type, uint8_t* payload, size_t length);
+      void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length);
 };
 
 #endif
