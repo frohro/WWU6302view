@@ -111,24 +111,30 @@ void CommManager::connect(const char* ssid, const char* pw) {
    _secondary_timer = micros();
 #endif
 
-   // IMPORTANT: Set static instance pointer BEFORE setting up callbacks
+   // Set the static instance pointer before anything else
    _instance = this;
-   
-   // Start the WebSocket server - AFTER semaphore and timer initialization
+
+   // Start the WebSocket server with a short delay for ESP32 stability
+   delay(100);
    _wss.begin();
-   
-   // Use a simple static callback to avoid memory/function pointer issues
+   delay(100);
+
+   // Set up a very simple event handler with minimal functionality
    _wss.onEvent([](uint8_t num, WStype_t type, uint8_t* payload, size_t length) {
-      // Safely access the instance pointer
-      if (CommManager::_instance != nullptr) {
-         CommManager::_instance->_on_websocket_event(num, type, payload, length);
+      // Only process text messages for safety
+      if (type == WStype_TEXT && CommManager::_instance != nullptr) {
+         // Simple message handling - just copy to buffer
+         if (length > 0 && length < MAX_BUFFER_LEN && payload != nullptr) {
+            memcpy(CommManager::_instance->_buf, payload, length);
+            CommManager::_instance->_buf[length] = '\0';
+         }
       }
    });
 
    // Mark manager as ready
    _ready = true;
    
-   // Add a small delay to ensure WebSocket server is properly initialized
+   // Another small delay for stability
    delay(100);
 }
 #endif  // This is the closing bracket for #ifdef S302_WEBSOCKETS
