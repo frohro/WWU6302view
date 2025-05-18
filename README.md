@@ -20,18 +20,7 @@ If you want to use the serial connection like I did with the RC circuit, you mak
 
     -DS302_SERIAL
 
-Please note that the most recent version of WebSockets will not work until 6302view or WebSockets gets fixed.  It crashes.  Version 2.4.0 works fine.  This probably doesn't effect the guys using serial.  This is fixed in the platformio.ini.  I also made a few minor changes to 6302view and put the forked version on my web site and this repository pulls it from there.  It turns the power down to 8.5 dBm, because without that these super mini boards have a hard time connecting.  The power amplifier is probably distorted at higher power.   You can git clone the repository like this:
-
-```
-git clone https://github.com/frohro/WWU6302view.git
-```
-
-
-If you just want to look at the repository in your browser, the url is this:
-
-https://github.com/frohro/WWU6302view
-
-
+Please note that the most recent version of WebSockets will not work until 6302view or WebSockets gets fixed.  It crashes.  Version 2.4.0 works fine.  This probably doesn't effect the guys using serial.  This is fixed in the platformio.ini.  I also made a few minor changes to 6302view and put the forked version on my web site and this repository pulls it from there.  It turns the power down to 8.5 dBm, because without that these super mini boards have a hard time connecting.  The power amplifier is probably distorted at higher power.  
 
 If you use WebSockets, you will need to change the SSID and password of the access point.
 
