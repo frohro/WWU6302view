@@ -36,6 +36,6 @@ The browser window is setup like this.  Type the address and port in, and hit th
 
 Of course you will need to replace the PlotExample.cpp with your own code.  I suggest just dragging it to the test directory in VScode and putting your code in a new file in the src directory.  The little -> in the bottom toolbar builds your code.  
 
-Of course the docs for 6302view are in [docs.md](https://github.com/almonds0166/6302view/blob/master/docs.md)
+Of course the docs for 6302view are in [docs.md](https://github.com/almonds0166/6302view/blob/master/docs.md).
 
 I hope this helps!
