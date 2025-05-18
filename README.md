@@ -24,7 +24,7 @@ Please note that the most recent version of WebSockets will not work until 6302v
 
 ```
 git clone https://github.com/frohro/WWU6302view.git
-
+```
 
 
 If you just want to look at the repository in your browser, the url is this:
@@ -41,7 +41,7 @@ You get the IP address and port to put into the gui.html from the serial monitor
 [  1808][D][WiFiGeneric.cpp:1103] _eventCallback(): STA IP: 192.168.1.109, MASK: 255.255.255.0, GW: 192.168.1.1
 connected!
 --> 192.168.1.109:80 <--
-
+```
 The browser window is setup like this.  Type the address and port in, and hit the connect button.
 
 [](gui.png)
