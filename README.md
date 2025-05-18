@@ -44,7 +44,7 @@ connected!
 ```
 The browser window is setup like this.  Type the address and port in, and hit the connect button.
 
-[](gui.png)
+![](gui.png)
 
 Of course you will need to replace the PlotExample.cpp with your own code.  I suggest just dragging it to the test directory in VScode and putting your code in a new file in the src directory.  The little -> in the bottom toolbar builds your code.  
 
