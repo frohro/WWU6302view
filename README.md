@@ -2,7 +2,7 @@
 
 
 
-This repository is to help students to use 6302view with the ESP32-C3 super mini.  It can also work for other ESP32 variants with small modifications to the platformio.ini.  The ESP32-C3 has a different type of serial over USB from the regular ESP32 and so it needs these build flags:
+This repository is to help students to use 6302view with the ESP32-C3 super mini and the Raspberry Pi Pico.  It can also work for other ESP32 variants with small modifications to the platformio.ini.  The ESP32-C3 has a different type of serial over USB from the regular ESP32 and so it needs these build flags:
 
     -D ARDUINO_USB_MODE=1
 
@@ -20,7 +20,9 @@ If you want to use the serial connection like I did with the RC circuit, you mak
 
     -DS302_SERIAL
 
-Please note that the most recent version of WebSockets will not work until 6302view or WebSockets gets fixed.  It crashes.  Version 2.4.0 works fine.  This probably doesn't effect the guys using serial.  This is fixed in the platformio.ini.  I also made a few minor changes to 6302view and put the forked version on my web site and this repository pulls it from there.  It turns the power down to 8.5 dBm, because without that these super mini boards have a hard time connecting.  The power amplifier is probably distorted at higher power.  
+ I have made different configurations in the platformio.ini and have a video [here](https://youtu.be/JPnaQLVj8Lw) that shows you how to select the various options that allow you to build for several microprocessors using either a Serial or WebSocket connection.
+
+Please note that the most recent version of WebSockets will not work until 6302view or WebSockets gets fixed.  It crashes.  Version 2.4.0 works fine.  This probably doesn't effect the guys using serial.  The platformio.ini is set to use versior 2.4.0.  I also made a few minor changes to 6302view and put the forked version on my web site and this repository pulls it from there.  It turns the power down to 8.5 dBm, because without that these super mini boards have a hard time connecting.  The power amplifier is probably distorted at higher power.  
 
 If you use WebSockets, you will need to change the SSID and password of the access point.
 
